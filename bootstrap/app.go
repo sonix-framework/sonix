@@ -12,6 +12,7 @@ import (
 	"github.com/sonix-framework/core/logging"
 
 	"github.com/sonix-framework/sonix/internal/greeter"
+	"github.com/sonix-framework/sonix/internal/jobs"
 	"github.com/sonix-framework/sonix/internal/notes"
 )
 
@@ -20,15 +21,21 @@ func CreateApplication() (*app.Application, error) {
 	// 1. Config: precedence defaults -> file -> environment.
 	cfg := config.New()
 	err := cfg.Defaults(map[string]any{
-		"app.name":              "sonix",
-		"logging.level":         "info",
-		"logging.format":        "text",
-		"heartbeat.interval":    "2s",
-		"http.port":             8080,
-		"http.read_timeout":     "10s",
-		"http.write_timeout":    "10s",
-		"http.idle_timeout":     "120s",
-		"http.shutdown_timeout": "10s",
+		"app.name":               "sonix",
+		"logging.level":          "info",
+		"logging.format":         "text",
+		"heartbeat.interval":     "2s",
+		"http.port":              8080,
+		"http.read_timeout":      "10s",
+		"http.write_timeout":     "10s",
+		"http.idle_timeout":      "120s",
+		"http.shutdown_timeout":  "10s",
+		"queue.driver":           "memory",
+		"queue.workers":          2,
+		"queue.buffer":           100,
+		"queue.max_attempts":     3,
+		"queue.retry_backoff":    "1s",
+		"queue.shutdown_timeout": "10s",
 	})
 	if err != nil {
 		return nil, fmt.Errorf("bootstrap: defaults: %w", err)
@@ -66,6 +73,9 @@ func CreateApplication() (*app.Application, error) {
 	}
 	if err := application.Register(&notes.Provider{}); err != nil {
 		return nil, fmt.Errorf("bootstrap: register provider %T: %w", &notes.Provider{}, err)
+	}
+	if err := application.Register(&jobs.Provider{}); err != nil {
+		return nil, fmt.Errorf("bootstrap: register provider %T: %w", &jobs.Provider{}, err)
 	}
 
 	return application, nil

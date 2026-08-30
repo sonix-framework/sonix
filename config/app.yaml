@@ -11,3 +11,11 @@ http:
   write_timeout: 10s
   idle_timeout: 120s
   shutdown_timeout: 10s
+
+queue:
+  driver: memory
+  workers: 2
+  buffer: 100
+  max_attempts: 3
+  retry_backoff: 1s
+  shutdown_timeout: 10s
