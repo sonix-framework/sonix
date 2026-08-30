@@ -1,0 +1,13 @@
+app:
+  name: Sonix Demo
+logging:
+  level: debug
+  format: text
+heartbeat:
+  interval: 1s
+http:
+  port: 8080
+  read_timeout: 10s
+  write_timeout: 10s
+  idle_timeout: 120s
+  shutdown_timeout: 10s
