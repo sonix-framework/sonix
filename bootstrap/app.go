@@ -10,6 +10,7 @@ import (
 	"github.com/sonix-framework/core/config"
 	"github.com/sonix-framework/core/httpx"
 	"github.com/sonix-framework/core/logging"
+	"github.com/sonix-framework/core/queue"
 
 	"github.com/sonix-framework/sonix/internal/greeter"
 	"github.com/sonix-framework/sonix/internal/jobs"
@@ -73,6 +74,9 @@ func CreateApplication() (*app.Application, error) {
 	}
 	if err := application.Register(&notes.Provider{}); err != nil {
 		return nil, fmt.Errorf("bootstrap: register provider %T: %w", &notes.Provider{}, err)
+	}
+	if err := application.Register(&queue.Provider{}); err != nil {
+		return nil, fmt.Errorf("bootstrap: register provider %T: %w", &queue.Provider{}, err)
 	}
 	if err := application.Register(&jobs.Provider{}); err != nil {
 		return nil, fmt.Errorf("bootstrap: register provider %T: %w", &jobs.Provider{}, err)
