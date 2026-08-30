@@ -8,6 +8,7 @@ import (
 
 	"github.com/sonix-framework/core/app"
 	"github.com/sonix-framework/core/config"
+	"github.com/sonix-framework/core/database"
 	"github.com/sonix-framework/core/httpx"
 	"github.com/sonix-framework/core/logging"
 	"github.com/sonix-framework/core/queue"
@@ -22,21 +23,24 @@ func CreateApplication() (*app.Application, error) {
 	// 1. Config: precedence defaults -> file -> environment.
 	cfg := config.New()
 	err := cfg.Defaults(map[string]any{
-		"app.name":               "sonix",
-		"logging.level":          "info",
-		"logging.format":         "text",
-		"heartbeat.interval":     "2s",
-		"http.port":              8080,
-		"http.read_timeout":      "10s",
-		"http.write_timeout":     "10s",
-		"http.idle_timeout":      "120s",
-		"http.shutdown_timeout":  "10s",
-		"queue.driver":           "memory",
-		"queue.workers":          2,
-		"queue.buffer":           100,
-		"queue.max_attempts":     3,
-		"queue.retry_backoff":    "1s",
-		"queue.shutdown_timeout": "10s",
+		"app.name":                    "sonix",
+		"logging.level":               "info",
+		"logging.format":              "text",
+		"heartbeat.interval":          "2s",
+		"http.port":                   8080,
+		"http.read_timeout":           "10s",
+		"http.write_timeout":          "10s",
+		"http.idle_timeout":           "120s",
+		"http.shutdown_timeout":       "10s",
+		"queue.driver":                "memory",
+		"queue.workers":               2,
+		"queue.buffer":                100,
+		"queue.max_attempts":          3,
+		"queue.retry_backoff":         "1s",
+		"database.default":            "sqlite",
+		"database.connections.sqlite": map[string]any{"driver": "sqlite", "dsn": "file:notes.db"},
+		"database.connections.sqlite.max_open_conns": 5,
+		"queue.shutdown_timeout":                     "10s",
 	})
 	if err != nil {
 		return nil, fmt.Errorf("bootstrap: defaults: %w", err)
@@ -68,6 +72,9 @@ func CreateApplication() (*app.Application, error) {
 
 	if err := application.Register(&greeter.Provider{}); err != nil {
 		return nil, fmt.Errorf("bootstrap: register provider %T: %w", &greeter.Provider{}, err)
+	}
+	if err := application.Register(&database.Provider{}); err != nil {
+		return nil, fmt.Errorf("bootstrap: register provider %T: %w", &database.Provider{}, err)
 	}
 	if err := application.Register(&httpx.Provider{}); err != nil {
 		return nil, fmt.Errorf("bootstrap: register provider %T: %w", &httpx.Provider{}, err)

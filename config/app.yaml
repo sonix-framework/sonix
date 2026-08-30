@@ -12,6 +12,14 @@ http:
   idle_timeout: 120s
   shutdown_timeout: 10s
 
+database:
+  default: sqlite
+  connections:
+    sqlite:
+      driver: sqlite
+      dsn: file:notes.db
+      max_open_conns: 5
+
 queue:
   driver: memory
   workers: 2
